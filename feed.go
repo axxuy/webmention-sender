@@ -13,3 +13,14 @@ type atomEntry struct {
 type entryLink struct {
 	Link string `xml:"href,attr"`
 }
+
+type Entry struct {
+	Id    string
+	Url   string
+	Links []string
+}
+
+func ParseAtomFeed(data []byte) ([]Entry, error) {
+	return nil, nil
+
+}
