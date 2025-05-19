@@ -1,5 +1,7 @@
 package feed
 
+import "encoding/xml"
+
 type atomFeed struct {
 	Title     string `xml:"title"`
 	Author    string `xml:"author"`
@@ -21,6 +23,11 @@ type Entry struct {
 }
 
 func ParseAtomFeed(data []byte) ([]Entry, error) {
+	var feed atomFeed
+	err := xml.Unmarshal(data)
+	if err != nil {
+		return nil, err
+	}
 	return nil, nil
 
 }
