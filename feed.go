@@ -1,6 +1,9 @@
 package feed
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"errors"
+)
 
 type atomFeed struct {
 	Title     string `xml:"title"`
@@ -24,10 +27,12 @@ type Entry struct {
 
 func ParseAtomFeed(data []byte) ([]Entry, error) {
 	var feed atomFeed
-	err := xml.Unmarshal(data)
+	err := xml.Unmarshal(data, &feed)
 	if err != nil {
 		return nil, err
 	}
+	if feed.NameSpace != "http://www.w3.org/2005/Atom" {
+		return nil, errors.New("Invalid atom feed") //About the laziest kind of validation we can do, but sometimes the bar really is that low
+	}
 	return nil, nil
-
 }
