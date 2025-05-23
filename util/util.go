@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func Find_all_by_tag(doc html.Node, tag string) ([]*html.Node, error) {
+func FindAllByTag(doc html.Node, tag string) ([]*html.Node, error) {
 	tagAtom := atom.Lookup([]byte(tag))
 	if tagAtom == atom.Atom(0) {
 		return nil, errors.New("No such tag")
