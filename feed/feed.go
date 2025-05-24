@@ -10,9 +10,10 @@ import (
 )
 
 type atomFeed struct {
-	Title     string `xml:"title"`
-	Author    string `xml:"author"`
-	NameSpace string `xml:"xmlns,attr"`
+	Title     string      `xml:"title"`
+	Author    string      `xml:"author"`
+	NameSpace string      `xml:"xmlns,attr"`
+	Entries   []atomEntry `xml:"entry"`
 }
 type atomEntry struct {
 	Link    entryLink `xml:"link"` //This bit of inderection is needed to get the href. It seems go's xml parser is a bit fiddly with self closing tags
