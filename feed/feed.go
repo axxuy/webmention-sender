@@ -3,6 +3,7 @@ package feed
 import (
 	"encoding/xml"
 	"errors"
+	"net/url"
 	"strings"
 
 	"github.com/axxuy/webmention-sender/util"
@@ -28,7 +29,7 @@ type entryLink struct {
 type Entry struct {
 	Id    string
 	Url   string
-	Links []string
+	Links []*url.URL
 }
 
 func convertEntry(entry atomEntry) (Entry, error) {
@@ -43,11 +44,15 @@ func convertEntry(entry atomEntry) (Entry, error) {
 	if err != nil {
 		return Entry{}, err
 	}
-	links := make([]string, 0)
+	links := make([]*url.URL, 0)
 	for _, node := range linkNodes {
 		for _, attr := range node.Attr {
 			if attr.Key == "href" {
-				links = append(links, attr.Val)
+				url, err := url.Parse(attr.Val)
+				if err != nil {
+					continue
+				}
+				links = append(links, url)
 			}
 		}
 	}
