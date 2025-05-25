@@ -69,5 +69,14 @@ func ParseAtomFeed(data []byte) ([]Entry, error) {
 	if feed.NameSpace != "http://www.w3.org/2005/Atom" {
 		return nil, errors.New("Invalid atom feed") //About the laziest kind of validation we can do, but sometimes the bar really is that low
 	}
-	return nil, nil
+	numEntries := len(feed.Entries)
+	entries := make([]Entry, 0, numEntries)
+	for _, rawEntry := range feed.Entries {
+		entry, err := convertEntry(rawEntry)
+		if err != nil {
+			continue
+		}
+		entries = append(entries, entry)
+	}
+	return entries, nil
 }
