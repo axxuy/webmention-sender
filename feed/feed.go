@@ -61,9 +61,13 @@ func convertEntry(entry atomEntry) (Entry, error) {
 		for _, attr := range node.Attr {
 			if attr.Key == "href" {
 				url := parseLink(attr.Val)
-				if url != nil {
-					links = append(links, url)
+				if url == nil {
+					continue
 				}
+				if url.Hostname() == postUrl.Hostname() {
+					continue
+				}
+				links = append(links, url)
 			}
 		}
 	}
