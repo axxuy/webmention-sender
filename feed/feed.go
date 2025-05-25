@@ -28,7 +28,7 @@ type entryLink struct {
 
 type Entry struct {
 	Id    string
-	Url   string
+	Url   *url.URL
 	Links []*url.URL
 }
 
@@ -44,9 +44,10 @@ func parseLink(link string) *url.URL {
 }
 
 func convertEntry(entry atomEntry) (Entry, error) {
-	result := Entry{}
-	result.Id = entry.Id
-	result.Url = entry.Link.Link
+	postUrl, err := url.Parse(entry.Link.Link)
+	if err != nil {
+		return Entry{}, nil
+	}
 	contentHtml, err := html.Parse(strings.NewReader(entry.Content))
 	if err != nil {
 		return Entry{}, err
@@ -66,8 +67,7 @@ func convertEntry(entry atomEntry) (Entry, error) {
 			}
 		}
 	}
-	result.Links = links
-	return result, nil
+	return Entry{entry.Id, postUrl, links}, nil
 }
 
 func ParseAtomFeed(data []byte) ([]Entry, error) {
