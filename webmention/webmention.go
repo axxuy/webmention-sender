@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/axxuy/webmention-sender/util"
+	"golang.org/x/net/html"
 )
 
 type Endpoint struct {
@@ -38,6 +39,29 @@ func parseLinkHeader(header []string) string {
 }
 
 func parsePage(page io.Reader) string {
+	pageHtml, err := html.Parse(page)
+	if err != nil {
+		return ""
+	}
+	linkNodes, err := util.FindAllByTag(*pageHtml, []string{"a", "link"})
+	if err != nil {
+		return ""
+	}
+	for _, node := range linkNodes {
+		var link string
+		var hasRel bool
+		for _, attr := range node.Attr {
+			if attr.Key == "rel" && attr.Val == "webmention" {
+				hasRel = true
+			}
+			if attr.Key == "href" {
+				link = attr.Val
+			}
+		}
+		if hasRel && link != "" {
+			return link
+		}
+	}
 	return ""
 }
 func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
