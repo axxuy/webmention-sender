@@ -1,6 +1,7 @@
 package webmention
 
 import (
+	"errors"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -46,8 +47,16 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 		return nil, nil
 	}
 	endpointUrl := parseLinkHeader(headResp.Header.Values("Link"))
-	if endpointUrl == "" {
-		return nil, nil
+	if endpointUrl != "" {
+		url, err := url.Parse(endpointUrl)
+		if err != nil {
+			return nil, err
+		}
+		//TODO: handle relative endpoint urls
+		if !url.IsAbs() {
+			return nil, errors.New("Relative webmention endpoint")
+		}
+		return &Endpoint{client, url}, nil
 	}
 
 	//If there was nothing in the HEAD we'll need to GET the full page
