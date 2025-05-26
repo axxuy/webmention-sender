@@ -77,12 +77,8 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	}
 	endpointUrl := parseLinkHeader(headResp.Header.Values("Link"))
 	if endpointUrl != "" {
-		url, err := url.Parse(endpointUrl)
-		if err != nil {
-			return nil, err
-		}
-		//TODO: handle relative endpoint urls
-		if !url.IsAbs() {
+		url := util.ParseLink(endpointUrl)
+		if url == nil {
 			return nil, errors.New("Relative webmention endpoint")
 		}
 		return &Endpoint{client, url}, nil
@@ -99,12 +95,8 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	}
 	endpointUrl = parsePage(bodyResp.Body)
 	if endpointUrl != "" {
-		url, err := url.Parse(endpointUrl)
-		if err != nil {
-			return nil, err
-		}
-		//TODO: handle relative endpoint urls
-		if !url.IsAbs() {
+		url := util.ParseLink(endpointUrl)
+		if url == nil {
 			return nil, errors.New("Relative webmention endpoint")
 		}
 		return &Endpoint{client, url}, nil
