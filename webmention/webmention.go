@@ -2,6 +2,7 @@ package webmention
 
 import (
 	"errors"
+	"io"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -35,6 +36,10 @@ func parseLinkHeader(header []string) string {
 	}
 	return ""
 }
+
+func parsePage(page io.Reader) string {
+	return ""
+}
 func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	client := &http.Client{}
 	//Check Header
@@ -60,8 +65,27 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	}
 
 	//If there was nothing in the HEAD we'll need to GET the full page
+	bodyResp, err := client.Get(targetUrl.String())
+	if err != nil {
+		return nil, err
+	}
+	defer bodyResp.Body.Close()
+	if bodyResp.StatusCode != http.StatusOK {
+		return nil, nil
+	}
+	endpointUrl = parsePage(bodyResp.Body)
+	if endpointUrl != "" {
+		url, err := url.Parse(endpointUrl)
+		if err != nil {
+			return nil, err
+		}
+		//TODO: handle relative endpoint urls
+		if !url.IsAbs() {
+			return nil, errors.New("Relative webmention endpoint")
+		}
+		return &Endpoint{client, url}, nil
+	}
 	return nil, nil
-
 }
 
 func (e *Endpoint) SendWebmention(endpointUrl, targetUrl, sourceUrl *url.URL) error {
