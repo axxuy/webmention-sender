@@ -24,13 +24,10 @@ func parseLinkHeader(header []string) string {
 		}
 		headerFields := strings.Split(headerVal, ",")
 		for _, field := range headerFields {
-			fieldParts := strings.Split(field, ";")
-			for _, part := range fieldParts {
-				attrPattern := regexp.MustCompile(`rel\s*=\s*"?\s*webmention`)
-				if attrPattern.MatchString(part) {
-					link := util.CutSubString("<", ">", part)
-					return link
-				}
+			attrPattern := regexp.MustCompile(`;.*rel\s*=\s*"?\s*webmention`)
+			if attrPattern.MatchString(field) {
+				link := util.CutSubString("<", ">", field)
+				return link
 			}
 		}
 
