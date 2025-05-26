@@ -32,17 +32,6 @@ type Entry struct {
 	Links []*url.URL
 }
 
-func parseLink(link string) *url.URL {
-	url, err := url.Parse(link)
-	if err != nil {
-		return nil
-	}
-	if !url.IsAbs() {
-		return nil
-	}
-	return url
-}
-
 func convertEntry(entry atomEntry) (Entry, error) {
 	postUrl, err := url.Parse(entry.Link.Link)
 	if err != nil {
@@ -60,7 +49,7 @@ func convertEntry(entry atomEntry) (Entry, error) {
 	for _, node := range linkNodes {
 		for _, attr := range node.Attr {
 			if attr.Key == "href" {
-				url := parseLink(attr.Val)
+				url := util.ParseLink(attr.Val)
 				if url == nil {
 					continue
 				}

@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	"net/url"
 	"slices"
 	"strings"
 
@@ -39,4 +40,15 @@ func FindAllByTag(doc html.Node, tags []string) ([]*html.Node, error) {
 		}
 	}
 	return result, nil
+}
+
+func ParseLink(link string) *url.URL {
+	url, err := url.Parse(link)
+	if err != nil {
+		return nil
+	}
+	if !url.IsAbs() {
+		return nil
+	}
+	return url
 }
