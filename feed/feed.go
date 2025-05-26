@@ -52,7 +52,7 @@ func convertEntry(entry atomEntry) (Entry, error) {
 	if err != nil {
 		return Entry{}, err
 	}
-	linkNodes, err := util.FindAllByTag(*contentHtml, "a")
+	linkNodes, err := util.FindAllByTag(*contentHtml, []string{"a"})
 	if err != nil {
 		return Entry{}, err
 	}
