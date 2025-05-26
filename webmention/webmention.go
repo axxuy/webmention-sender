@@ -37,15 +37,15 @@ func parseLinkHeader(header []string) string {
 func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	client := &http.Client{}
 	//Check Header
-	resp, err := client.Head(targetUrl.String())
+	headResp, err := client.Head(targetUrl.String())
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
+	defer headResp.Body.Close()
+	if headResp.StatusCode != http.StatusOK {
 		return nil, nil
 	}
-	endpointUrl := parseLinkHeader(resp.Header.Values("Link"))
+	endpointUrl := parseLinkHeader(headResp.Header.Values("Link"))
 	if endpointUrl == "" {
 		return nil, nil
 	}
