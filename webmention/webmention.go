@@ -41,13 +41,12 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	client := &http.Client{}
 	//Check Header
 	resp, err := client.Head(targetUrl.String())
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, nil
-	}
 	if err != nil {
 		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, nil
 	}
 	endpointUrl := parseLinkHeader(resp.Header.Values("Link"))
 	if endpointUrl == "" {
