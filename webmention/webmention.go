@@ -38,7 +38,27 @@ func parseLinkHeader(header []string) string {
 	return ""
 }
 func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
+	client := &http.Client{}
+	//Check Header
+	resp, err := client.Head(targetUrl.String())
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	endpointUrl := parseLinkHeader(resp.Header.Values("Link"))
+	if endpointUrl == "" {
+		return nil, nil
+	}
+
+	//If there was nothing in the HEAD we'll need to GET the full page
+	return nil, nil
+
 }
 
 func (e *Endpoint) SendWebmention(endpointUrl, targetUrl, sourceUrl *url.URL) error {
+	return nil
 }
