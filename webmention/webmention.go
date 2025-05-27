@@ -105,5 +105,25 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 }
 
 func (e *Endpoint) SendWebmention(endpointUrl, targetUrl, sourceUrl *url.URL) error {
+	if e == nil {
+		return errors.New("Endpoint is nil")
+	}
+	if e.client == nil {
+		return errors.New("Endpoint has no http Client")
+	}
+	if e.url == nil {
+		return errors.New("Endpoint has no url")
+	}
+	body := url.Values{}
+	body.Set("source", sourceUrl.String())
+	body.Set("target", targetUrl.String())
+	resp, err := e.client.PostForm(e.url.String(), body)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode >= 300 {
+		return errors.New(resp.Status)
+	}
+
 	return nil
 }
