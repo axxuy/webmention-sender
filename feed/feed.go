@@ -3,8 +3,11 @@ package feed
 import (
 	"encoding/xml"
 	"errors"
+	"io"
+	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/axxuy/webmention-sender/util"
 	"golang.org/x/net/html"
@@ -82,4 +85,39 @@ func ParseAtomFeed(data []byte) ([]Entry, error) {
 		entries = append(entries, entry)
 	}
 	return entries, nil
+}
+
+// Retrieve and parse an Atom feed from url. It makes a conditional request and returns nil if the feed has not been updated since lastFetch
+func Fetch(url string, lastFetch *time.Time) ([]Entry, error) {
+	if lastFetch == nil {
+		lastFetch = &time.Time{}
+	}
+	timestamp := lastFetch.Format("Mon, 02 Jan 2006 03:04:05 GMT")
+	r, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	r.Header.Set("If-Modified-Since", timestamp)
+	r.Header.Set("User-Agent", "github.com/axxuy/webmention-sender")
+	resp, err := http.DefaultClient.Do(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotModified {
+		return nil, nil
+	} else if resp.StatusCode == http.StatusOK {
+		data, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		feed, err := ParseAtomFeed(data)
+		if err != nil {
+			return nil, err
+		}
+		return feed, nil
+	} else {
+		return nil, errors.New(resp.Status)
+	}
 }
