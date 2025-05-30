@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	"net/http"
 	"net/url"
 	"slices"
 	"strings"
@@ -9,6 +10,18 @@ import (
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
+
+const USER_AGENT = "Webmention Sender/0.1.0 (http://github.com/axxuy/webmention-sender"
+
+func MakeRequest(method, url string) (*http.Request, error) {
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	//Set custom headers
+	req.Header.Set("User-Agent", USER_AGENT)
+	return req, nil
+}
 
 // return a substring of s between before and after. If either separator does not appear, return ""
 func CutSubString(before, after, s string) string {
