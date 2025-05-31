@@ -93,12 +93,11 @@ func Fetch(url string, lastFetch *time.Time) ([]Entry, error) {
 		lastFetch = &time.Time{}
 	}
 	timestamp := lastFetch.Format("Mon, 02 Jan 2006 03:04:05 GMT")
-	r, err := http.NewRequest("GET", url, nil)
+	r, err := util.MakeRequest("GET", url)
 	if err != nil {
 		return nil, err
 	}
 	r.Header.Set("If-Modified-Since", timestamp)
-	r.Header.Set("User-Agent", "github.com/axxuy/webmention-sender")
 	resp, err := http.DefaultClient.Do(r)
 	if err != nil {
 		return nil, err
