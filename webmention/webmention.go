@@ -67,7 +67,12 @@ func parsePage(page io.Reader) string {
 func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	client := &http.Client{}
 	//Check Header
-	headResp, err := client.Head(targetUrl.String())
+	//headResp, err := client.Head(targetUrl.String())
+	req, err := util.MakeRequest("HEAD", targetUrl.String())
+	if err != nil {
+		return nil, err
+	}
+	headResp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +90,11 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	}
 
 	//If there was nothing in the HEAD we'll need to GET the full page
-	bodyResp, err := client.Get(targetUrl.String())
+	req, err = util.MakeRequest("GET", targetUrl.String())
+	if err != nil {
+		return nil, err
+	}
+	bodyResp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
