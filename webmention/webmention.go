@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/axxuy/webmention-sender/util"
 	"golang.org/x/net/html"
@@ -65,7 +66,7 @@ func parsePage(page io.Reader) string {
 	return ""
 }
 func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
-	client := &http.Client{}
+	client := &http.Client{Timeout: time.Second * 5}
 	//Check Header
 	//headResp, err := client.Head(targetUrl.String())
 	req, err := util.MakeRequest("HEAD", targetUrl.String())
