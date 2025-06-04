@@ -126,7 +126,11 @@ func (e *Endpoint) SendWebmention(endpointUrl, targetUrl, sourceUrl *url.URL) er
 	body := url.Values{}
 	body.Set("source", sourceUrl.String())
 	body.Set("target", targetUrl.String())
-	resp, err := e.client.PostForm(e.url.String(), body)
+	req, err := util.PostForm(e.url.String(), body)
+	if err != nil {
+		return err
+	}
+	resp, err := e.client.Do(req)
 	if err != nil {
 		return err
 	}
