@@ -22,6 +22,15 @@ func MakeRequest(method, url string) (*http.Request, error) {
 	req.Header.Set("User-Agent", USER_AGENT)
 	return req, nil
 }
+func PostForm(url string, body url.Values) (*http.Request, error) {
+	req, err := http.NewRequest("POST", url, strings.NewReader(body.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", USER_AGENT)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	return req, nil
+}
 
 // return a substring of s between before and after. If either separator does not appear, return ""
 func CutSubString(before, after, s string) string {
