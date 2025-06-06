@@ -114,7 +114,7 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	return nil, nil
 }
 
-func (e *Endpoint) Send(endpointUrl, targetUrl, sourceUrl *url.URL) error {
+func (e *Endpoint) Send(targetUrl, sourceUrl *url.URL) error {
 	if e == nil {
 		return errors.New("Endpoint is nil")
 	}
