@@ -11,7 +11,7 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-const USER_AGENT = "Webmention Sender/0.1.0 (http://github.com/axxuy/webmention-sender"
+const USER_AGENT = "Webmention Sender/0.1.0 (https://github.com/axxuy/webmention-sender)"
 
 func MakeRequest(method, url string) (*http.Request, error) {
 	req, err := http.NewRequest(method, url, nil)
