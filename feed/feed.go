@@ -30,9 +30,10 @@ type entryLink struct {
 }
 
 type Entry struct {
-	Id    string
-	Url   *url.URL
-	Links []*url.URL
+	Id        string
+	Url       *url.URL
+	Links     []*url.URL
+	Published time.Time
 }
 
 func convertEntry(entry atomEntry) (Entry, error) {
@@ -63,7 +64,11 @@ func convertEntry(entry atomEntry) (Entry, error) {
 			}
 		}
 	}
-	return Entry{entry.Id, postUrl, links}, nil
+	pubTime, err := time.Parse(time.RFC3339, entry.PubDate)
+	if err != nil {
+		pubTime = time.Time{}
+	}
+	return Entry{entry.Id, postUrl, links, pubTime}, nil
 }
 
 func ParseAtomFeed(data []byte) ([]Entry, error) {
