@@ -64,6 +64,7 @@ func convertEntry(entry atomEntry) (Entry, error) {
 			}
 		}
 	}
+
 	pubTime, err := time.Parse(time.RFC3339, entry.PubDate)
 	if err != nil {
 		pubTime = time.Time{}
@@ -92,7 +93,7 @@ func ParseAtomFeed(data []byte) ([]Entry, error) {
 	return entries, nil
 }
 
-// Retrieve and parse an Atom feed from url. It makes a conditional request and returns nil if the feed has not been updated since lastFetch
+// Retrieve and parse an Atom feed from url and return all entries added after lastFetch. It makes a conditional request and returns nil if the feed has not been updated since lastFetch
 func Fetch(url string, lastFetch *time.Time) ([]Entry, error) {
 	if lastFetch == nil {
 		lastFetch = &time.Time{}
@@ -120,7 +121,13 @@ func Fetch(url string, lastFetch *time.Time) ([]Entry, error) {
 		if err != nil {
 			return nil, err
 		}
-		return feed, nil
+		results := make([]Entry, 0, len(feed))
+		for _, entry := range feed {
+			if entry.Published.After(*lastFetch) {
+				results = append(results, entry)
+			}
+		}
+		return results, nil
 	} else {
 		return nil, errors.New(resp.Status)
 	}
