@@ -69,6 +69,10 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	client := &http.Client{Timeout: time.Second * 5}
 	//Check Header
 	//headResp, err := client.Head(targetUrl.String())
+	if !(targetUrl.Scheme == "https" || targetUrl.Scheme == "http") {
+		return nil, errors.New("Not an HTTP link")
+	}
+
 	req, err := util.MakeRequest("HEAD", targetUrl.String())
 	if err != nil {
 		return nil, err
