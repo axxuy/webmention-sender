@@ -23,13 +23,13 @@ func (f *Feeds) Set(value string) error {
 }
 
 func main() {
-	var feedUrl string
+	var feedUrls Feeds
 	var interval int
-	flag.StringVar(&feedUrl, "feed", "", "Url of the rss feed to monitor")
+	flag.Var(&feedUrls, "feed", "Url of the rss feed to monitor")
 	flag.IntVar(&interval, "interval", 6, "Time in hours since the feed was last checked")
 	firstRun := flag.Bool("first-run", false, "Is this the first time you have checked this feed?")
 	flag.Parse()
-	if feedUrl == "" {
+	if len(feedUrls) == 0 {
 		log.Fatal("No feed given")
 	}
 	var lastRun time.Time
@@ -40,7 +40,9 @@ func main() {
 		now := time.Now()
 		lastRun = now.Add(delta)
 	}
-	doFeedWebmentions(feedUrl, &lastRun)
+	for _, feedUrl := range feedUrls {
+		doFeedWebmentions(feedUrl, &lastRun)
+	}
 
 }
 
