@@ -4,9 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/axxuy/webmention-sender/feed"
+	"github.com/axxuy/webmention-sender/webmention"
 )
 
 func main() {
@@ -31,6 +33,30 @@ func main() {
 	if err != nil {
 		log.Fatal("Could not retrieve feed: " + err.Error())
 	}
-	fmt.Println(entries)
+	endpoints := make(map[string]*webmention.Endpoint)
+	for _, entry := range entries {
+		for _, link := range entry.Links {
+			host := link.Hostname()
+			//Do we already have an endpoint for this domain?
+			endpoint, ok := endpoints[host]
+			if !ok {
+				//Try to get one
+				endpoint, err := webmention.GetWebmentionEndpoint(link)
+				//If that fails record it in the table
+				if err != nil || endpoint == nil {
+					endpoints[host] = nil
+					continue
+				}
+				endpoints[host] = endpoint
+			}
+			//Have we previously failed to get an endpoint for this domain?
+			if endpoint == nil {
+				continue
+			}
+
+			err = endpoint.Send(link, entry.Url)
+			fmt.Fprintf(os.Stderr, "Error: %v sending to %v\n", err.Error(), link.String())
+		}
+	}
 
 }
