@@ -29,7 +29,13 @@ func main() {
 		now := time.Now()
 		lastRun = now.Add(delta)
 	}
-	entries, err := feed.Fetch(feedUrl, &lastRun)
+	doFeedWebmentions(feedUrl, &lastRun)
+
+}
+
+func doFeedWebmentions(feedUrl string, lastRun *time.Time) {
+
+	entries, err := feed.Fetch(feedUrl, lastRun)
 	if err != nil {
 		log.Fatal("Could not retrieve feed: " + err.Error())
 	}
@@ -58,5 +64,4 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error: %v sending to %v\n", err.Error(), link.String())
 		}
 	}
-
 }
