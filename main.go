@@ -11,6 +11,17 @@ import (
 	"github.com/axxuy/webmention-sender/webmention"
 )
 
+type Feeds []string
+
+func (f *Feeds) String() string {
+	return fmt.Sprintf("%v", *f)
+}
+
+func (f *Feeds) Set(value string) error {
+	*f = append(*f, value)
+	return nil
+}
+
 func main() {
 	var feedUrl string
 	var interval int
