@@ -14,8 +14,10 @@ import (
 )
 
 type Endpoint struct {
-	client *http.Client
-	url    *url.URL
+	client      *http.Client
+	url         *url.URL
+	lastRequest time.Time
+	rate        time.Duration
 }
 
 // Check the http Link header for a url with rel="webmention"
@@ -67,6 +69,8 @@ func parsePage(page io.Reader) string {
 }
 func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	client := &http.Client{Timeout: time.Second * 5}
+	now := time.Now()
+	maxRate := time.Second * 2
 	//Check Header
 	//headResp, err := client.Head(targetUrl.String())
 	if !(targetUrl.Scheme == "https" || targetUrl.Scheme == "http") {
@@ -91,7 +95,7 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 		if url == nil {
 			return nil, errors.New("Relative webmention endpoint")
 		}
-		return &Endpoint{client, url}, nil
+		return &Endpoint{client, url, now, maxRate}, nil
 	}
 
 	//If there was nothing in the HEAD we'll need to GET the full page
@@ -113,7 +117,7 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 		if url == nil {
 			return nil, errors.New("Relative webmention endpoint")
 		}
-		return &Endpoint{client, url}, nil
+		return &Endpoint{client, url, now, maxRate}, nil
 	}
 	return nil, nil
 }
@@ -127,6 +131,12 @@ func (e *Endpoint) Send(targetUrl, sourceUrl *url.URL) error {
 	}
 	if e.url == nil {
 		return errors.New("Endpoint has no url")
+	}
+	now := time.Now()
+	elapsed := now.Sub(e.lastRequest)
+	if elapsed > e.rate {
+		remaining := time.Until(e.lastRequest.Add(e.rate))
+		time.Sleep(remaining)
 	}
 	body := url.Values{}
 	body.Set("source", sourceUrl.String())
