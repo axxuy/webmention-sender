@@ -58,6 +58,7 @@ func doFeedWebmentions(feedUrl string, lastRun *time.Time) {
 	if err != nil {
 		log.Fatal("Could not retrieve feed: " + err.Error())
 	}
+	slog.Info("Retrieved feed", "feed", feedUrl, "numEntries", len(entries))
 	endpoints := make(map[string]*webmention.Endpoint)
 	for _, entry := range entries {
 		for _, link := range entry.Links {
@@ -67,6 +68,7 @@ func doFeedWebmentions(feedUrl string, lastRun *time.Time) {
 			if !ok {
 				//Try to get one
 				endpoint, err := webmention.GetWebmentionEndpoint(link)
+				slog.Info("Looked up link for webmention endpoint", "feed", feedUrl, "url", link, "error", err)
 				//If that fails record it in the table
 				if err != nil || endpoint == nil {
 					endpoints[host] = nil
@@ -80,6 +82,7 @@ func doFeedWebmentions(feedUrl string, lastRun *time.Time) {
 			}
 
 			err = endpoint.Send(link, entry.Url)
+			slog.Info("Sent webmention", "target", link, "source", entry.Url, "error", err)
 			fmt.Fprintf(os.Stderr, "Error: %v sending to %v\n", err.Error(), link.String())
 		}
 	}
