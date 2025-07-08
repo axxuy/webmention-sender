@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"net/url"
 	"os"
 	"time"
 
@@ -61,7 +62,15 @@ func doFeedWebmentions(feedUrl string, lastRun *time.Time) {
 	slog.Info("Retrieved feed", "feed", feedUrl, "numEntries", len(entries))
 	endpoints := make(map[string]*webmention.Endpoint)
 	for _, entry := range entries {
+		sentLinks := make(map[*url.URL]bool)
 		for _, link := range entry.Links {
+			//Links may occur multiple times in a document; only send a mention for one
+			_, ok := sentLinks[link]
+			if ok {
+				continue
+			} else {
+				sentLinks[link] = true
+			}
 			host := link.Hostname()
 			//Do we already have an endpoint for this domain?
 			endpoint, ok := endpoints[host]
