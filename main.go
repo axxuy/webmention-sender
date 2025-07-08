@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"time"
 
@@ -28,6 +29,11 @@ func main() {
 	flag.Var(&feedUrls, "feed", "Url of the rss feed to monitor")
 	flag.IntVar(&interval, "interval", 6, "Time in hours since the feed was last checked")
 	firstRun := flag.Bool("first-run", false, "Is this the first time you have checked this feed?")
+	verbose := flag.Bool("verbose", false, "List extra information")
+	slog.SetLogLoggerLevel(slog.LevelDebug)
+	if *verbose {
+		slog.SetLogLoggerLevel(slog.LevelInfo)
+	}
 	flag.Parse()
 	if len(feedUrls) == 0 {
 		log.Fatal("No feed given")
