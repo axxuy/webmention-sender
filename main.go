@@ -92,7 +92,9 @@ func doFeedWebmentions(feedUrl string, lastRun *time.Time) {
 
 			err = endpoint.Send(link, entry.Url)
 			slog.Info("Sent webmention", "target", link, "source", entry.Url, "error", err)
-			fmt.Fprintf(os.Stderr, "Error: %v sending to %v\n", err.Error(), link.String())
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v sending to %v\n", err.Error(), link.String())
+			}
 		}
 	}
 }
