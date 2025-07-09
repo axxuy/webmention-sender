@@ -57,9 +57,6 @@ func convertEntry(entry atomEntry) (Entry, error) {
 				if url == nil {
 					continue
 				}
-				if url.Hostname() == postUrl.Hostname() {
-					continue
-				}
 				links = append(links, url)
 			}
 		}
