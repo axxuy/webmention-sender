@@ -79,7 +79,7 @@ func doFeedWebmentions(feedUrl string, lastRun *time.Time) {
 				endpoint, err := webmention.GetWebmentionEndpoint(link)
 				slog.Info("Looked up link for webmention endpoint", "feed", feedUrl, "url", link, "error", err)
 				//If that fails record it in the table
-				if err != nil || endpoint == nil {
+				if err != nil {
 					endpoints[host] = nil
 					continue
 				}
