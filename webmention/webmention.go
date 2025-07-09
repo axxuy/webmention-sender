@@ -152,6 +152,6 @@ func (e *Endpoint) Send(targetUrl, sourceUrl *url.URL) error {
 	if resp.StatusCode >= 300 {
 		return errors.New(resp.Status)
 	}
-
+	e.lastRequest = time.Now()
 	return nil
 }
