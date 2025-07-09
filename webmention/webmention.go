@@ -86,7 +86,7 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	}
 	defer bodyResp.Body.Close()
 	if bodyResp.StatusCode != http.StatusOK {
-		return nil, nil
+		return nil, errors.New(bodyResp.Status)
 	}
 	endpointUrl := parsePage(bodyResp.Body)
 	url := util.ParseLink(endpointUrl)
