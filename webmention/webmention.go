@@ -71,35 +71,12 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	client := &http.Client{Timeout: time.Second * 5}
 	now := time.Now()
 	maxRate := time.Second * 2
-	//Check Header
-	//headResp, err := client.Head(targetUrl.String())
+
 	if !(targetUrl.Scheme == "https" || targetUrl.Scheme == "http") {
 		return nil, errors.New("Not an HTTP link")
 	}
 
-	req, err := util.MakeRequest("HEAD", targetUrl.String())
-	if err != nil {
-		return nil, err
-	}
-	headResp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer headResp.Body.Close()
-	if headResp.StatusCode != http.StatusOK {
-		return nil, nil
-	}
-	endpointUrl := parseLinkHeader(headResp.Header.Values("Link"))
-	if endpointUrl != "" {
-		url := util.ParseLink(endpointUrl)
-		if url == nil {
-			return nil, errors.New("Relative webmention endpoint")
-		}
-		return &Endpoint{client, url, now, maxRate}, nil
-	}
-
-	//If there was nothing in the HEAD we'll need to GET the full page
-	req, err = util.MakeRequest("GET", targetUrl.String())
+	req, err := util.MakeRequest("GET", targetUrl.String())
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +88,7 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 	if bodyResp.StatusCode != http.StatusOK {
 		return nil, nil
 	}
-	endpointUrl = parsePage(bodyResp.Body)
+	endpointUrl := parsePage(bodyResp.Body)
 	url := util.ParseLink(endpointUrl)
 	if url == nil {
 		return nil, errors.New("No valid webmention link present")
