@@ -112,14 +112,12 @@ func GetWebmentionEndpoint(targetUrl *url.URL) (*Endpoint, error) {
 		return nil, nil
 	}
 	endpointUrl = parsePage(bodyResp.Body)
-	if endpointUrl != "" {
-		url := util.ParseLink(endpointUrl)
-		if url == nil {
-			return nil, errors.New("Relative webmention endpoint")
-		}
-		return &Endpoint{client, url, now, maxRate}, nil
+	url := util.ParseLink(endpointUrl)
+	if url == nil {
+		return nil, errors.New("No valid webmention link present")
 	}
-	return nil, nil
+
+	return &Endpoint{client, url, now, maxRate}, nil
 }
 
 func (e *Endpoint) Send(targetUrl, sourceUrl *url.URL) error {
