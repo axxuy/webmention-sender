@@ -65,6 +65,9 @@ func FindAllByTag(doc html.Node, tags []string) ([]*html.Node, error) {
 }
 
 func ParseLink(link string) *url.URL {
+	if link == "" {
+		return nil
+	}
 	url, err := url.Parse(link)
 	if err != nil {
 		return nil
